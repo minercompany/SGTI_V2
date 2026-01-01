@@ -2,7 +2,16 @@
 const nextConfig = {
     reactStrictMode: true,
     images: {
-        domains: ['localhost'],
+        remotePatterns: [
+            {
+                protocol: 'http',
+                hostname: 'localhost',
+            },
+            {
+                protocol: 'https',
+                hostname: '**',
+            },
+        ],
     },
     typescript: {
         ignoreBuildErrors: true,
@@ -14,7 +23,7 @@ const nextConfig = {
         return [
             {
                 source: '/api/:path*',
-                destination: 'http://localhost:8081/api/:path*',
+                destination: 'http://localhost:8082/api/:path*',
             },
         ]
     },

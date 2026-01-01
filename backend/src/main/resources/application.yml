@@ -1,0 +1,131 @@
+# =====================================================
+# SGTI Enterprise - Application Configuration
+# =====================================================
+
+spring:
+  application:
+    name: sgti-backend
+  
+  # Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sgti_db
+    username: sgti
+    password: sgti_secret_2024
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+    
+    # Flyway Configuration
+    flyway:
+      baseline-on-migrate: true
+      baseline-version: 1
+  
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+  
+  # Redis Configuration (desactivado temporalmente para desarrollo)
+  # data:
+  #   redis:
+  #     host: localhost
+  #     port: 6379
+  
+  # RabbitMQ Configuration
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: sgti
+    password: sgti_rabbit_2024
+  
+  # Mail Configuration
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  
+  # Servlet Configuration
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+
+# Server Configuration
+server:
+  port: 8081  # Puerto producción
+  # servlet:
+  #   context-path: /api
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:sgti_jwt_secret_key_very_long_and_secure_2024}
+  expiration: 86400000  # 24 hours
+  refresh-expiration: 604800000  # 7 days
+
+# MinIO Configuration
+minio:
+  endpoint: http://localhost:9000
+  access-key: sgti_admin
+  secret-key: sgti_minio_secret_2024
+  bucket:
+    tickets: sgti-tickets
+    profiles: sgti-profiles
+    kb: sgti-knowledge-base
+
+# Meilisearch Configuration
+meilisearch:
+  host: http://localhost:7700
+  api-key: sgti_meili_master_key_2024
+
+# Logging
+logging:
+  level:
+    root: INFO
+    py.com.cooperativa.reducto: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+
+# OpenAPI / Swagger
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+
+# Cooperativa API Integration
+cooperativa:
+  api:
+    base-url: ${COOP_API_URL:http://localhost:8082}
+    timeout: 30000

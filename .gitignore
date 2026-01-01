@@ -1,0 +1,81 @@
+# =============================================================================
+# SGTI - Sistema de Gestión de Tickets Interdepartamental
+# .gitignore
+# =============================================================================
+
+# ========================
+# Backend (Spring Boot / Java)
+# ========================
+backend/target/
+backend/*.jar
+backend/*.war
+backend/*.log
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# ========================
+# Frontend (Next.js / Node)
+# ========================
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/*.log
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# ========================
+# IDE / Editor
+# ========================
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ========================
+# Environment files
+# ========================
+.env
+.env.local
+*.env
+
+# ========================
+# Logs
+# ========================
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ========================
+# OS Files
+# ========================
+.DS_Store
+Thumbs.db
+
+# ========================
+# Build artifacts
+# ========================
+dist/
+build/
+*.class
+*.jar
+*.war
+
+# ========================
+# Temporary files
+# ========================
+tmp/
+temp/
+*.tmp
+*.bak
+
+# ========================
+# Database
+# ========================
+*.db
+*.sqlite

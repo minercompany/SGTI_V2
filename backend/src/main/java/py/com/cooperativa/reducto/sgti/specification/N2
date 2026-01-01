@@ -1,0 +1,503 @@
+
+SGTI PREMIUM
+Sistema de Gestión Integral por Tickets
+Especificación Técnica Completa
+
+COOPERATIVA REDUCTO LTDA.
+
+Versión:	1.0
+Fecha:	Enero 2025
+Elaborado por:	Avanzantec Group SRL
+Equipo Desarrollo:	Antigravity
+Cliente:	Cooperativa Reducto Ltda.
+ 
+1. RESUMEN EJECUTIVO
+Este documento presenta la especificación técnica completa para la evolución del Sistema de Gestión Integral por Tickets (SGTI) hacia una versión Premium, diseñada específicamente para las necesidades operativas de Cooperativa Reducto Ltda.
+El objetivo principal es transformar SGTI en una herramienta de gestión interna de clase mundial que optimice la comunicación interdepartamental, reduzca tiempos de respuesta y proporcione visibilidad gerencial sobre las operaciones de soporte.
+1.1 Objetivos Estratégicos
+•	Reducir el tiempo promedio de resolución de tickets en un 40%
+•	Automatizar la asignación y escalamiento de tickets
+•	Proporcionar dashboards en tiempo real para la toma de decisiones
+•	Integrar todos los canales de comunicación interna
+•	Crear una base de conocimiento que reduzca tickets repetitivos
+1.2 Beneficios Esperados
+Área	Beneficio Esperado
+Eficiencia Operativa	Reducción de 40% en tiempo de resolución
+Satisfacción Interna	Mejora en la percepción del servicio de soporte
+Visibilidad Gerencial	Dashboards en tiempo real y reportes automáticos
+Reducción de Costos	Menos tickets repetitivos gracias a base de conocimiento
+Trazabilidad	Auditoría completa de todas las operaciones
+ 
+2. CONTEXTO DEL PROYECTO
+2.1 Sobre Cooperativa Reducto
+Característica	Detalle
+Socios	+32,000 socios activos
+Sucursales	Múltiples sucursales en Paraguay
+Departamentos	TI, Créditos, Cobranzas, RRHH, Contabilidad, Operaciones, Gerencia
+Empleados	Personal administrativo y operativo en todas las sucursales
+Sistemas Relacionados	Core Bancario, SIGA (en desarrollo), Intranet
+2.2 Problemática Actual
+Actualmente, la gestión de solicitudes internas entre departamentos presenta los siguientes desafíos:
+1.	Falta de visibilidad sobre el estado de las solicitudes
+2.	Asignación manual de tickets que genera retrasos
+3.	Ausencia de métricas para medir el desempeño
+4.	Tickets repetitivos que podrían evitarse con documentación
+5.	Comunicación fragmentada entre canales (email, teléfono, presencial)
+ 
+3. STACK TECNOLÓGICO ACTUAL
+El sistema SGTI está construido sobre una arquitectura moderna y robusta que permite escalabilidad y mantenibilidad a largo plazo.
+3.1 Backend
+Componente	Tecnología / Versión
+Lenguaje	Java 21 LTS (OpenJDK 21)
+Framework	Spring Boot 3.2.1
+Seguridad	Spring Security 6.x + JWT (JJWT 0.12.3)
+ORM	Hibernate 6.4.1 + Spring Data JPA
+Reportes	Apache POI 5.2.5 (Excel) + OpenPDF 1.3.36 (PDF)
+Utilidades	Lombok + MapStruct 1.5.5
+Build	Maven 3.x
+Búsqueda (preparado)	Meilisearch Java SDK 0.11.5
+Almacenamiento (preparado)	MinIO 8.5.7
+3.2 Frontend
+Componente	Tecnología / Versión
+Lenguaje	TypeScript 5.3.3
+Framework	Next.js 14.0.4 + React 18.2.0
+Estilos	Tailwind CSS 3.4.0
+Componentes UI	Shadcn UI (Radix UI)
+Estado	Zustand 4.4.7 + React Query 5.17.0
+Formularios	React Hook Form 7.49.2 + Zod 3.22.4
+Gráficos	Recharts 2.10.3
+Animaciones	Framer Motion 10.17.0
+WebSockets (preparado)	socket.io-client 4.7.2
+3.3 Base de Datos
+Componente	Detalle
+Motor	PostgreSQL 16
+Base de Datos	sgti_db
+Tablas Actuales	13 tablas principales
+Puerto Backend	8081
+Puerto Frontend	3000
+3.4 Entidades Actuales
+#	Entidad	Descripción
+1	usuarios	Usuarios del sistema (empleados)
+2	departamentos	Áreas organizacionales de la cooperativa
+3	tickets	Solicitudes/incidencias registradas
+4	estados	Estados posibles de un ticket
+5	prioridades	Niveles de prioridad
+6	categorias	Clasificación de tickets
+7	respuestas	Respuestas/comentarios en tickets
+8	adjuntos	Archivos adjuntos
+9	notificaciones	Notificaciones a usuarios
+10	configuracion	Configuraciones del sistema
+11	auditoria	Registro de acciones
+12	roles	Roles de usuario
+13	permisos	Permisos granulares
+ 
+4. MEJORAS DE ALTO IMPACTO INMEDIATO
+Estas mejoras aprovechan componentes que ya están preparados en el sistema y solo requieren activación y configuración.
+4.1 Notificaciones en Tiempo Real (WebSockets)
+4.1.1 Descripción
+Implementar notificaciones push en tiempo real utilizando la infraestructura de WebSockets ya preparada con socket.io-client.
+4.1.2 Funcionalidades
+•	Notificación instantánea cuando se crea un ticket para el departamento
+•	Badge de notificación sin necesidad de refrescar la página
+•	Alerta visual y sonora cuando el SLA está por vencer
+•	Actualización automática del estado en la tabla de tickets
+•	Indicador de "escribiendo" cuando otro agente responde
+4.1.3 Eventos WebSocket
+Evento	Descripción
+ticket:created	Nuevo ticket creado en el departamento
+ticket:assigned	Ticket asignado a un agente específico
+ticket:updated	Cambio de estado o prioridad
+ticket:response	Nueva respuesta agregada al ticket
+sla:warning	SLA próximo a vencer (25% tiempo restante)
+sla:breached	SLA vencido
+4.2 Búsqueda Instantánea (Meilisearch)
+4.2.1 Descripción
+Activar el motor de búsqueda Meilisearch para proporcionar búsqueda en tiempo real con tolerancia a errores tipográficos.
+4.2.2 Campos Indexados
+Campo	Peso	Descripción
+numero_ticket	Alto	Identificador único
+titulo	Alto	Título del ticket
+descripcion	Medio	Descripción detallada
+solicitante	Medio	Nombre del solicitante
+departamento	Bajo	Departamento destino
+categoria	Bajo	Categoría del ticket
+4.2.3 Características
+•	Búsqueda mientras se escribe (debounce 300ms)
+•	Tolerancia a errores tipográficos
+•	Filtros combinables (estado, prioridad, fecha)
+•	Resaltado de términos encontrados
+•	Resultados en menos de 50ms
+4.3 Almacenamiento de Adjuntos (MinIO)
+4.3.1 Descripción
+Utilizar MinIO como sistema de almacenamiento de objetos para gestionar adjuntos de manera escalable y segura.
+4.3.2 Configuración de Buckets
+Bucket	Propósito	Retención
+sgti-attachments	Adjuntos de tickets	Permanente
+sgti-temp	Archivos temporales	24 horas
+sgti-knowledge	Documentos de KB	Permanente
+4.3.3 Tipos de Archivo Permitidos
+•	Imágenes: PNG, JPG, GIF, WEBP (máximo 10MB)
+•	Documentos: PDF, DOC, DOCX, XLS, XLSX (máximo 25MB)
+•	Comprimidos: ZIP, RAR (máximo 50MB)
+•	Logs: TXT, LOG, CSV (máximo 10MB)
+ 
+5. DASHBOARDS Y REPORTES
+5.1 Panel de Jefe de Departamento
+Dashboard personalizado para supervisores que muestra métricas de su área en tiempo real.
+5.1.1 Componentes del Dashboard
+Componente	Descripción
+KPIs Principales	Tickets hoy, pendientes, resueltos esta semana, tiempo promedio
+Tickets Urgentes	Lista de tickets con SLA próximo a vencer o vencido
+Carga por Agente	Barra horizontal con tickets asignados por persona
+Tendencia Semanal	Gráfico de línea con tickets creados vs resueltos
+Por Categoría	Gráfico de pastel con distribución por tipo
+5.2 Panel Gerencial
+Vista ejecutiva con métricas consolidadas de todos los departamentos.
+5.2.1 Métricas Ejecutivas
+Métrica	Descripción
+Eficiencia General	Porcentaje de tickets resueltos dentro de SLA
+Por Departamento	Comparativa de volumen y tiempos entre áreas
+Tendencia Mensual	Evolución de tickets en los últimos 12 meses
+Top Agentes	Ranking de agentes por resolución y satisfacción
+Problemas Recurrentes	Tickets que se repiten frecuentemente
+Heatmap	Mapa de calor de tickets por hora/día
+5.3 Reportes Operativos
+5.3.1 Reportes Predefinidos
+Reporte	Frecuencia	Destinatarios
+Resumen Diario	Diario 8:00 AM	Jefes de Departamento
+Productividad Semanal	Lunes 7:00 AM	Gerencia + Jefes
+Cumplimiento SLA	Mensual	Gerencia General
+Análisis Tendencias	Trimestral	Directorio
+Tickets Recurrentes	Mensual	TI + Área afectada
+ 
+6. SISTEMA DE AUTOMATIZACIONES
+6.1 Motor de Reglas
+Sistema configurable para automatizar acciones basadas en condiciones sin necesidad de programación.
+6.1.1 Estructura de Reglas
+Componente	Descripción
+Nombre	Identificador único de la regla
+Condiciones (SI)	Una o más condiciones que deben cumplirse (AND/OR)
+Acciones (ENTONCES)	Acciones a ejecutar cuando se cumplen las condiciones
+Prioridad	Orden de evaluación (1-100, menor = mayor prioridad)
+Estado	Activa / Inactiva
+6.1.2 Condiciones Disponibles
+Campo	Operadores
+departamento_destino	igual a, diferente de, está en lista
+departamento_solicitante	igual a, diferente de, está en lista
+categoria	igual a, diferente de, está en lista
+prioridad	igual a, mayor que, menor que
+titulo	contiene, no contiene, empieza con
+tiempo_sin_respuesta	mayor que X horas/días
+tiempo_abierto	mayor que X horas/días
+horario	dentro de horario laboral, fuera de horario
+6.1.3 Acciones Disponibles
+Acción	Descripción
+Asignar a usuario	Asignar ticket a un agente específico
+Asignar a grupo	Asignar al agente con menor carga del grupo
+Cambiar prioridad	Elevar o reducir la prioridad
+Cambiar estado	Mover a un estado específico
+Agregar etiqueta	Añadir etiqueta para clasificación
+Enviar notificación	Notificar a usuarios específicos
+Enviar email	Enviar correo a destinatarios
+Agregar respuesta	Insertar respuesta automática
+Ejecutar webhook	Llamar a sistema externo
+6.1.4 Ejemplos de Reglas para Reducto
+Regla 1: Escalamiento VIP
+SI: solicitante.departamento = "Gerencia General" Y prioridad >= "Alta"
+ENTONCES: Asignar a Jefe de Departamento destino + Notificar a Gerente de Área + SLA = 2 horas
+Regla 2: Auto-asignación TI por Categoría
+SI: departamento_destino = "TI" Y categoria = "Hardware"
+ENTONCES: Asignar a grupo "Técnicos de Soporte"
+Regla 3: Escalamiento por Tiempo
+SI: tiempo_sin_respuesta > 4 horas Y prioridad = "Alta"
+ENTONCES: Notificar a Jefe de Departamento + Marcar como "Requiere Atención"
+Regla 4: Auto-cierre por Inactividad
+SI: estado = "Esperando Respuesta" Y tiempo_sin_respuesta > 7 días
+ENTONCES: Enviar recordatorio al solicitante. Si > 10 días: Cerrar ticket automáticamente.
+6.2 Configuración de SLA
+6.2.1 Matriz de SLA
+Prioridad	Primera Respuesta	Resolución	Ejemplo
+Crítica	30 minutos	4 horas	Sistema caído
+Alta	2 horas	8 horas	Afecta operación
+Media	8 horas	3 días	Solicitud normal
+Baja	24 horas	5 días	Consulta general
+6.2.2 Indicadores Visuales de SLA
+Indicador	Condición
+🟢 Verde	Más del 50% del tiempo SLA disponible
+🟡 Amarillo	Entre 25% y 50% del tiempo SLA disponible
+🔴 Rojo	Menos del 25% o SLA vencido
+6.3 Plantillas de Respuesta
+Respuestas predefinidas para agilizar la atención de casos frecuentes.
+Plantilla	Contenido
+Reseteo Contraseña	Su contraseña ha sido reseteada. La contraseña temporal es: [TEMP]. Por favor cámbiela en su próximo ingreso.
+Solicitud Equipo	Su solicitud ha sido registrada. Pasará por aprobación: Jefe Inmediato → RRHH → TI. Le notificaremos cuando esté listo.
+En Espera Info	Para continuar necesitamos: [lista de información]. Por favor responda a este ticket con los datos solicitados.
+Problema Conocido	Este es un problema conocido que está siendo trabajado. Referencia: [KB-XXX]. Le notificaremos cuando se resuelva.
+Verificación	El problema ha sido resuelto. Por favor verifique y confirme que todo funciona correctamente.
+ 
+7. INTEGRACIONES INTERNAS
+7.1 Active Directory / LDAP
+7.1.1 Funcionalidades
+•	Single Sign-On: Usuario ingresa con credenciales de Windows
+•	Auto-provisioning: Usuarios se crean automáticamente al primer login
+•	Sincronización de departamento desde grupos AD
+•	Mapeo de roles basado en grupos de seguridad
+7.1.2 Mapeo de Grupos AD a Roles SGTI
+Grupo Active Directory	Rol SGTI
+SGTI_Administradores	Administrador
+SGTI_Jefes	Jefe de Departamento
+SGTI_Agentes_TI	Agente TI
+SGTI_Agentes_[Depto]	Agente [Departamento]
+Domain Users	Usuario (por defecto)
+7.2 Correo Institucional
+7.2.1 Flujo Email-to-Ticket
+1.	Usuario envía email a soporte@reducto.coop.py
+2.	SGTI procesa el email y crea ticket automáticamente
+3.	Sistema detecta remitente y asigna departamento origen
+4.	Adjuntos del email se guardan en MinIO
+5.	Usuario recibe confirmación con número de ticket
+6.	Agente responde desde SGTI → Usuario recibe en su correo
+7.2.2 Buzones de Correo por Departamento
+Buzón	Departamento Destino
+soporte@reducto.coop.py	TI (default)
+rrhh@reducto.coop.py	Recursos Humanos
+creditos@reducto.coop.py	Créditos
+contabilidad@reducto.coop.py	Contabilidad
+7.3 Integración con SIGA
+Cuando el Sistema Integrado de Gestión de Asambleas (SIGA) esté en producción, se habilitará la integración bidireccional.
+Evento en SIGA	Acción en SGTI
+Problema técnico en asamblea	Crear ticket automático a TI con prioridad Crítica
+Socio reporta problema	Crear ticket con datos del socio precargados
+Ticket resuelto en SGTI	Notificar a coordinador de asamblea
+ 
+8. BASE DE CONOCIMIENTO
+8.1 Estructura de Contenido
+Base de conocimiento organizada por departamentos con artículos para autoservicio y referencia de agentes.
+8.1.1 Categorías Principales
+Categoría	Contenido	Acceso
+TI	Guías técnicas, resolución de problemas	Todos los empleados
+RRHH	Políticas, procedimientos, formularios	Todos los empleados
+Créditos	Procesos internos, documentación	Departamento Créditos
+Operaciones	Procedimientos operativos	Personal de sucursales
+General	Organigrama, contactos, extensiones	Todos los empleados
+Interno Agentes	Scripts, procedimientos de soporte	Solo agentes SGTI
+8.1.2 Artículos Sugeridos para TI
+•	Cómo resetear tu contraseña
+•	Configurar impresora de red
+•	Conectarse a la VPN desde casa
+•	Solicitar nuevo equipo o software
+•	Problemas comunes del Core Bancario
+•	Configurar firma de correo electrónico
+8.2 Sugerencia Automática de Artículos
+Cuando un usuario crea un ticket, el sistema analizará el título y descripción para sugerir artículos relevantes antes de enviar.
+8.2.1 Flujo de Sugerencia
+1.	Usuario escribe título del ticket
+2.	Sistema busca en KB artículos relacionados (Meilisearch)
+3.	Se muestran hasta 3 artículos sugeridos
+4.	Usuario puede: Ver artículo / Marcar como útil / Continuar creando ticket
+5.	Si el artículo resuelve el problema, no se crea ticket
+8.3 Métricas de Base de Conocimiento
+Métrica	Descripción
+Vistas por artículo	Cantidad de veces que se visualizó
+Tasa de resolución	% de usuarios que no crearon ticket después de ver
+Feedback positivo	Valoraciones "Útil" recibidas
+Artículos vinculados	Veces que el artículo fue citado en tickets
+Antigüedad	Alerta si no se actualiza en X meses
+ 
+9. MEJORAS DE EXPERIENCIA DE USUARIO
+9.1 Vista Kanban
+Vista alternativa tipo tablero para gestión visual de tickets por el equipo.
+9.1.1 Columnas del Tablero
+Columna	Descripción
+📥 Nuevos	Tickets recién creados sin asignar
+👷 En Proceso	Tickets asignados siendo trabajados
+⏳ Esperando	Esperando respuesta del solicitante o tercero
+✅ Resueltos Hoy	Tickets cerrados en el día actual
+9.1.2 Funcionalidades
+•	Arrastrar y soltar para cambiar estado
+•	Indicador visual de SLA en cada tarjeta
+•	Quick view al hacer hover sobre tarjeta
+•	Filtros rápidos por agente, prioridad, categoría
+•	Contador de tickets por columna
+9.2 Timeline del Ticket
+Visualización cronológica de todas las acciones realizadas en un ticket.
+Evento	Información Mostrada
+Creación	Usuario, fecha/hora, descripción inicial
+Asignación	Agente asignado, automático o manual
+Respuesta	Contenido de la respuesta, autor
+Nota interna	Nota visible solo para agentes
+Cambio de estado	Estado anterior → Estado nuevo
+Adjunto	Nombre del archivo, tamaño, vista previa
+Resolución	Tiempo total, dentro/fuera de SLA
+Calificación	Estrellas y comentario del solicitante
+9.3 Modo Oscuro
+Tema oscuro para reducir fatiga visual, especialmente útil para el equipo de TI.
+•	Toggle fácil en la barra superior
+•	Respeta preferencia del sistema operativo
+•	Persiste la preferencia del usuario
+•	Transición suave al cambiar de tema
+9.4 PWA para Técnicos Móviles
+Progressive Web App para que los técnicos puedan gestionar tickets desde dispositivos móviles.
+•	Ver tickets asignados
+•	Responder tickets desde el celular
+•	Tomar foto y adjuntar directamente
+•	Cambiar estado del ticket
+•	Recibir notificaciones push
+•	Funciona con conexión lenta o intermitente
+ 
+10. SEGURIDAD Y AUDITORÍA
+10.1 Control de Acceso por Roles
+Rol	Permisos
+Administrador	Configurar sistema, crear departamentos/categorías, ver reportes, gestionar usuarios
+Jefe Departamento	Ver tickets de su área, reasignar, ver reportes de equipo, aprobar solicitudes
+Agente	Ver tickets asignados, responder, resolver, crear tickets, ver KB
+Usuario	Crear tickets, ver propios tickets, consultar KB pública, calificar atención
+10.2 Registro de Auditoría
+Log completo de todas las acciones realizadas en el sistema.
+Evento Auditado	Datos Registrados
+Login/Logout	Usuario, IP, navegador, fecha/hora, éxito/fallo
+CRUD Tickets	Acción, usuario, ticket_id, cambios realizados
+Cambios de estado	Estado anterior, estado nuevo, usuario, motivo
+Asignaciones	Agente anterior, agente nuevo, manual/automático
+Exportaciones	Usuario, tipo de reporte, filtros aplicados
+Cambios config	Parámetro, valor anterior, valor nuevo, usuario
+10.3 Políticas de Retención
+Tipo de Dato	Retención
+Tickets y respuestas	5 años
+Logs de auditoría	3 años
+Adjuntos	5 años
+Logs de acceso	1 año
+Backups	6 meses rotativo
+ 
+11. MODELO DE DATOS EXTENDIDO
+Nuevas tablas requeridas para soportar las funcionalidades premium.
+11.1 Nuevas Tablas
+Tabla	Propósito
+reglas_automatizacion	Almacena las reglas del motor de automatización
+condiciones_regla	Condiciones de cada regla (relación 1:N)
+acciones_regla	Acciones a ejecutar por cada regla (relación 1:N)
+sla_configuracion	Configuración de SLA por prioridad/categoría
+sla_historial	Registro de cumplimiento de SLA por ticket
+plantillas_respuesta	Plantillas de respuesta rápida
+articulos_kb	Artículos de la base de conocimiento
+categorias_kb	Categorías de artículos KB
+feedback_kb	Valoraciones de artículos KB
+etiquetas	Etiquetas para clasificación adicional
+ticket_etiquetas	Relación N:M tickets-etiquetas
+notas_internas	Notas visibles solo para agentes
+calificaciones	Calificaciones de satisfacción del usuario
+reportes_programados	Configuración de reportes automáticos
+preferencias_usuario	Preferencias UI (tema, idioma, etc.)
+11.2 Estructura Tabla: reglas_automatizacion
+Campo	Tipo	Descripción
+id	BIGSERIAL	Clave primaria
+nombre	VARCHAR(100)	Nombre descriptivo de la regla
+descripcion	TEXT	Descripción detallada
+prioridad	INTEGER	Orden de evaluación (1-100)
+activa	BOOLEAN	Estado de la regla
+operador_logico	VARCHAR(10)	AND / OR entre condiciones
+created_at	TIMESTAMP	Fecha de creación
+updated_at	TIMESTAMP	Última modificación
+created_by	BIGINT FK	Usuario que creó la regla
+11.3 Estructura Tabla: sla_configuracion
+Campo	Tipo	Descripción
+id	BIGSERIAL	Clave primaria
+prioridad_id	BIGINT FK	Referencia a prioridad
+categoria_id	BIGINT FK NULL	Categoría específica (opcional)
+tiempo_respuesta	INTEGER	Minutos para primera respuesta
+tiempo_resolucion	INTEGER	Minutos para resolución
+horario_laboral	BOOLEAN	Solo cuenta horas laborales
+activo	BOOLEAN	Estado de la configuración
+11.4 Estructura Tabla: articulos_kb
+Campo	Tipo	Descripción
+id	BIGSERIAL	Clave primaria
+titulo	VARCHAR(200)	Título del artículo
+contenido	TEXT	Contenido en Markdown
+categoria_kb_id	BIGINT FK	Categoría del artículo
+estado	VARCHAR(20)	borrador/publicado/archivado
+publico	BOOLEAN	Visible para usuarios normales
+vistas	INTEGER	Contador de visualizaciones
+version	INTEGER	Número de versión
+created_at	TIMESTAMP	Fecha de creación
+updated_at	TIMESTAMP	Última modificación
+author_id	BIGINT FK	Autor del artículo
+ 
+12. ESPECIFICACIONES DE API
+12.1 Nuevos Endpoints
+Método	Endpoint	Descripción
+GET	/api/v1/dashboard/jefe	Dashboard jefe departamento
+GET	/api/v1/dashboard/gerencial	Dashboard gerencial
+GET	/api/v1/reglas	Listar reglas de automatización
+POST	/api/v1/reglas	Crear regla
+PUT	/api/v1/reglas/{id}	Actualizar regla
+GET	/api/v1/sla/config	Obtener configuración SLA
+PUT	/api/v1/sla/config	Actualizar configuración SLA
+GET	/api/v1/kb/articulos	Listar artículos KB
+POST	/api/v1/kb/articulos	Crear artículo
+GET	/api/v1/kb/buscar	Buscar en KB
+GET	/api/v1/plantillas	Listar plantillas respuesta
+GET	/api/v1/reportes/{tipo}	Generar reporte
+GET	/api/v1/search	Búsqueda global (Meilisearch)
+12.2 WebSocket Events
+Canal	Eventos
+ticket.{departamento_id}	created, updated, assigned, response
+user.{user_id}	notification, sla_warning, mention
+dashboard.{departamento_id}	stats_update, new_urgent
+ 
+13. ROADMAP DE IMPLEMENTACIÓN
+13.1 Fase 1: Activación Inmediata (2 semanas)
+•	Activar WebSockets (notificaciones real-time)
+•	Activar Meilisearch (búsqueda rápida)
+•	Activar MinIO (adjuntos)
+•	Implementar plantillas de respuesta
+•	Agregar modo oscuro
+13.2 Fase 2: Automatización (1 mes)
+•	Motor de reglas de asignación automática
+•	SLA configurable con alertas visuales
+•	Integración con correo institucional
+•	Dashboard para jefes de departamento
+13.3 Fase 3: Conocimiento y Reportes (1 mes)
+•	Base de conocimiento con editor Markdown
+•	Sugerencia automática de artículos
+•	Reportes semanales automáticos
+•	Panel gerencial con métricas consolidadas
+13.4 Fase 4: Integraciones (2 meses)
+•	Single Sign-On con Active Directory
+•	PWA para técnicos móviles
+•	Vista Kanban para equipos
+•	Integración futura con SIGA
+ 
+14. ESTIMACIÓN DE ESFUERZO
+14.1 Resumen por Fase
+Fase	Duración	Horas Est.	Prioridad
+Fase 1: Activación	2 semanas	40 horas	Alta
+Fase 2: Automatización	1 mes	80 horas	Alta
+Fase 3: KB y Reportes	1 mes	60 horas	Media
+Fase 4: Integraciones	2 meses	80 horas	Media
+TOTAL	~4.5 meses	~260 horas	-
+14.2 Desglose Detallado
+Componente	Horas Backend	Horas Frontend
+WebSockets + Notificaciones	16	12
+Meilisearch Integration	8	8
+MinIO Storage	8	4
+Motor de Reglas	32	16
+SLA System	16	8
+Dashboards	8	24
+Base de Conocimiento	24	20
+Email Integration	16	4
+Active Directory/LDAP	24	4
+PWA Mobile	4	20
+Vista Kanban	4	16
+Modo Oscuro + UI Polish	0	12
+14.3 Notas Importantes
+•	Las estimaciones incluyen desarrollo, testing y documentación
+•	Se recomienda desarrollo iterativo con entregas cada 2 semanas
+•	La Fase 1 puede iniciar inmediatamente aprovechando componentes existentes
+•	Priorizar según necesidades más urgentes de Reducto
+ 
+
+FIN DEL DOCUMENTO
+SGTI Premium - Especificación Técnica Completa
+Cooperativa Reducto Ltda. | Enero 2025
+Elaborado por Avanzantec Group SRL
+Equipo de Desarrollo: Antigravity

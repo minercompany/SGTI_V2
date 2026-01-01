@@ -1,0 +1,12 @@
+# Configuración WebSocket para SGTI
+spring:
+  websocket:
+    enabled: true
+
+# Configuración adicional para desarrollo
+server:
+  port: 8082
+
+# CORS para desarrollo
+cors:
+  allowed-origins: http://localhost:3000

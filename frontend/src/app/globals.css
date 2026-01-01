@@ -1,0 +1,205 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@layer base {
+  :root {
+    /* Fondos - Colores Cooperativos Claros */
+    --background: 140 100% 99%;
+    --background-secondary: 140 60% 97%;
+    --background-tertiary: 140 50% 95%;
+    --background-elevated: 0 0% 100%;
+
+    /* Texto */
+    --foreground: 140 40% 15%;
+    --muted: 140 10% 50%;
+    --muted-foreground: 140 15% 40%;
+
+    /* Acentos Cooperativos - Verde/Turquesa/Naranja */
+    --primary: 145 75% 48%;
+    /* Azul cooperativo vibrante */
+    --primary-foreground: 0 0% 100%;
+
+    --success: 142 71% 45%;
+    /* Verde éxito */
+    --success-foreground: 0 0% 100%;
+
+    --warning: 35 100% 55%;
+    /* Naranja cálido */
+    --warning-foreground: 0 0% 0%;
+
+    --danger: 0 84% 60%;
+    /* Rojo coral */
+    --danger-foreground: 0 0% 100%;
+
+    /* UI */
+    --border: 140 30% 85%;
+    --input: 140 30% 92%;
+    --ring: 145 75% 48%;
+
+    --radius: 0.75rem;
+  }
+
+  .light {
+    /* Ya es el tema por defecto en :root */
+  }
+
+  .dark {
+    /* Fondos Oscuros */
+    --background: 140 20% 8%;
+    --background-secondary: 140 15% 12%;
+    --background-tertiary: 140 10% 16%;
+    --background-elevated: 140 15% 10%;
+
+    /* Texto */
+    --foreground: 0 0% 98%;
+    --muted: 140 10% 50%;
+    --muted-foreground: 140 5% 65%;
+
+    /* Acentos mantienen vibrantes en oscuro */
+    --primary: 145 75% 55%;
+    /* Verde más brillante para oscuro */
+    --primary-foreground: 0 0% 100%;
+
+    /* UI */
+    --border: 140 15% 20%;
+    --input: 140 15% 18%;
+    --ring: 145 75% 55%;
+  }
+
+  .custom {
+    /* Se aplican vía CSS custom properties dinámicas */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  /* Scrollbar Premium */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background-secondary;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted rounded-full;
+    @apply hover:bg-muted-foreground;
+  }
+}
+
+@layer components {
+
+  /* Glassmorphism Card */
+  .glass-card {
+    @apply bg-gradient-to-br from-white/[0.03] to-transparent;
+    @apply backdrop-blur-xl;
+    @apply border border-white/[0.06];
+    @apply rounded-xl;
+    @apply transition-all duration-200;
+  }
+
+  .glass-card:hover {
+    @apply border-primary/30;
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.1);
+  }
+
+  /* Premium Button */
+  .btn-primary {
+    @apply bg-gradient-to-r from-primary to-violet-500;
+    @apply text-primary-foreground font-medium;
+    @apply px-4 py-2.5 rounded-lg;
+    @apply shadow-lg shadow-primary/25;
+    @apply transition-all duration-150;
+    @apply hover:shadow-xl hover:shadow-primary/30;
+    @apply hover:-translate-y-0.5;
+    @apply active:translate-y-0 active:scale-[0.98];
+    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0;
+  }
+
+  .btn-secondary {
+    @apply bg-background-tertiary;
+    @apply text-foreground font-medium;
+    @apply px-4 py-2.5 rounded-lg;
+    @apply border border-border;
+    @apply transition-all duration-150;
+    @apply hover:bg-background-elevated hover:border-muted;
+    @apply active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    @apply text-muted-foreground font-medium;
+    @apply px-4 py-2.5 rounded-lg;
+    @apply transition-all duration-150;
+    @apply hover:bg-background-tertiary hover:text-foreground;
+    @apply active:scale-[0.98];
+  }
+
+  .btn-danger {
+    @apply bg-gradient-to-r from-danger to-rose-600;
+    @apply text-danger-foreground font-medium;
+    @apply px-4 py-2.5 rounded-lg;
+    @apply shadow-lg shadow-danger/25;
+    @apply transition-all duration-150;
+    @apply hover:shadow-xl hover:shadow-danger/30;
+    @apply active:scale-[0.98];
+  }
+
+  /* Premium Input */
+  .input-premium {
+    @apply w-full px-4 py-2.5;
+    @apply bg-background-tertiary;
+    @apply border border-border rounded-lg;
+    @apply text-foreground placeholder:text-muted;
+    @apply transition-all duration-150;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary;
+  }
+
+  /* Skeleton Shimmer */
+  .skeleton {
+    @apply bg-gradient-to-r from-background-secondary via-background-tertiary to-background-secondary;
+    background-size: 200% 100%;
+    @apply animate-shimmer rounded-lg;
+  }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center gap-1.5;
+    @apply px-2.5 py-1 rounded-full;
+    @apply text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply bg-success/20 text-success;
+  }
+
+  .badge-warning {
+    @apply bg-warning/20 text-warning;
+  }
+
+  .badge-danger {
+    @apply bg-danger/20 text-danger;
+  }
+
+  .badge-primary {
+    @apply bg-primary/20 text-primary;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary to-violet-400;
+  }
+}

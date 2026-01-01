@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: sgti-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: sgti
+      POSTGRES_PASSWORD: sgti_secret_2024
+      POSTGRES_DB: sgti_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sgti -d sgti_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: sgti-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+
+  # MinIO Object Storage (S3-compatible)
+  minio:
+    image: minio/minio:latest
+    container_name: sgti-minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"   # API
+      - "9001:9001"   # Console
+    environment:
+      MINIO_ROOT_USER: sgti_admin
+      MINIO_ROOT_PASSWORD: sgti_minio_secret_2024
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+
+  # Meilisearch (Full-text search)
+  meilisearch:
+    image: getmeili/meilisearch:v1.6
+    container_name: sgti-meilisearch
+    restart: unless-stopped
+    ports:
+      - "7700:7700"
+    environment:
+      MEILI_MASTER_KEY: sgti_meili_master_key_2024
+    volumes:
+      - meilisearch_data:/meili_data
+
+  # RabbitMQ (Message Queue)
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: sgti-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"   # AMQP
+      - "15672:15672" # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: sgti
+      RABBITMQ_DEFAULT_PASS: sgti_rabbit_2024
+
+  # Adminer (DB Management)
+  adminer:
+    image: adminer:latest
+    container_name: sgti-adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+  meilisearch_data:
